@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage;
 import javax.swing.JComponent;
 
 import camera.FCam;
-import flibs.graphics.animation.Scaller;
+import flibs.graphics.Scaller;
 import view.states.PhotoSession;
 
 /**
@@ -54,7 +54,7 @@ public class CameraPreview extends JComponent implements Runnable, MouseListener
 			if (getWidth() > 0 && getHeight() > 0) {
 				BufferedImage snapshot = fcam.getSnapShot();
 				if (snapshot != null) {
-					img = Scaller.resize( snapshot, getWidth(), getHeight() );
+					EventQueue.invokeLater( () -> img = Scaller.basicScale( snapshot, getWidth(), getHeight() ) );
 					repaint();
 				}
 			}

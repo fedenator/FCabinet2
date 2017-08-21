@@ -9,8 +9,8 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JComponent;
 
+import flibs.graphics.Scaller;
 import flibs.graphics.animation.CodedAnimation;
-import flibs.graphics.animation.Scaller;
 import view.states.PhotoSession;
 
 /**
@@ -105,7 +105,7 @@ public class PhotoDisplayer extends JComponent{
 	}
 	public void setImage(BufferedImage image) {
 		originalImage = image;
-		this.image = Scaller.resize( originalImage, getWidth(), getHeight() );
+		this.image = Scaller.basicScale( originalImage, getWidth(), getHeight() );
 	}
 	public CodedAnimation getAnimation() {
 		return animation;

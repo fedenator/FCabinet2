@@ -31,6 +31,8 @@ public class PhotoSession extends JLayeredPane{
 	private static final long serialVersionUID = -3298912502204354233L;
 	
 	/*----------------------------- Atributos ----------------------------------------*/
+	private long delay;
+	
 	//Displayer para las fotos que se sacan
 	private PhotoDisplayer photoDisplayer1;
 	private PhotoDisplayer photoDisplayer2;
@@ -57,13 +59,14 @@ public class PhotoSession extends JLayeredPane{
 		app = Application.getInstance();
 		
 		//Carga el archivo de configuracion
-		FSON photoSessionConfig = FsonFileManagement.loadFsonFile("rsc\\PhotoSessionConfig.fson");
-		FSON config             = FsonFileManagement.loadFsonFile("config\\Config.fson");
+		FSON config = FsonFileManagement.loadFsonFile("config\\Config.fson");
+		
+		delay = (int)config.getDoubleValue("delay") * CodedAnimation.SECOND;
 		
 		//Imagen por defecto de los displayer para las fotos
-		BufferedImage defaultPhotoDisplayerImg = Loader.loadBufferedImage( photoSessionConfig.getStringValue("PhotoDisplayerDefault") );
+		BufferedImage defaultPhotoDisplayerImg = Loader.loadBufferedImage( config.getStringValue("PhotoDisplayerDefault") );
 		
-		backgroundImage = Loader.loadBufferedImage( photoSessionConfig.getStringValue("BackgroundImage") );
+		backgroundImage = Loader.loadBufferedImage( config.getStringValue("BackgroundImage") );
 		
 		//Carga la camara debug o la camara normal segun el archivo de configuracion
 		FCam fcam = ( config.getBooleanValue("modoSinCamara") )? new FCamDebug("rsc\\Example.jpg"): new FCamOpenCV(0, "lib\\opencv_java320.dll"); 
@@ -78,12 +81,12 @@ public class PhotoSession extends JLayeredPane{
 		photoDisplayer2 = new PhotoDisplayer(this, defaultPhotoDisplayerImg, 10, 262, 442, 242);
 		photoDisplayer3 = new PhotoDisplayer(this, defaultPhotoDisplayerImg, 10, 516, 442, 242);
 		cameraPreview = new CameraPreview(this, fcam, 462, 10, 894, 748);
-		countdownDisplayer = new CountdownDisplayer(100, 100, 500, 500);
+		countdownDisplayer = new CountdownDisplayer(delay, (int)(app.getWidth()/2 - 200/2), (int)(app.getHeight()/2 - 200/2), 200, 200);
 		
 		add(photoDisplayer1, photoDisplayer2, photoDisplayer3, cameraPreview);
 		add(countdownDisplayer, POPUP_LAYER);
 		
-		countdown = new CodedAnimation(60, 10000);
+		countdown = new CodedAnimation(60, delay);
 		
 		countdown.addSetUP( () -> countdownDisplayer.restart() );
 		
@@ -110,8 +113,10 @@ public class PhotoSession extends JLayeredPane{
 						new ScriptAnimation( () -> photoDisplayer3.setImage(cameraPreview.getSnapShot()) ),
 						photoDisplayer3.getAnimation(),
 						fglassPane.getAnimation()
-				)
+				),
+				new ScriptAnimation( () -> app.makeFilmStrip(photoDisplayer1.getImage(), photoDisplayer2.getImage(), photoDisplayer3.getImage()) )
 				);
+		
 	}
 	
 	/*--------------------------------- Funciones ------------------------------------*/

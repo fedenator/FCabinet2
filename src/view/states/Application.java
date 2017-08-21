@@ -2,6 +2,7 @@ package view.states;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
+import java.awt.image.BufferedImage;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -24,16 +25,16 @@ public class Application {
 			setFullScreen();
 			window.setVisible(true);
 			window.setLayout ( new BorderLayout() );
-			changePanel      ( new PhotoSession() );
-			window.repaint();
+			restart();
 		});
 	}
 	
 	/*------------------------------------- Funciones ------------------------------------------*/
 	private void changePanel(JComponent panel) {
-		if (currentPanel != null) window.getContentPane().remove(panel);
+		if (currentPanel != null) window.getContentPane().remove(currentPanel);
 		window.getContentPane().add( panel, BorderLayout.CENTER );
 		currentPanel = panel;
+		window.getContentPane().revalidate();
 		window.repaint();
 	}
 	
@@ -46,6 +47,14 @@ public class Application {
 	public void setGlassPane(JComponent comp) {
 		window.setGlassPane(comp);
 		comp.setVisible(true);
+	}
+	
+	public void restart() {
+		changePanel( new PhotoSession() );
+	}
+	
+	public void makeFilmStrip(BufferedImage photo1, BufferedImage photo2, BufferedImage photo3) {
+		changePanel( new FilmStripMaker(photo1, photo2, photo3) );
 	}
 	
 	/*--------------------------------- Getters y Setters --------------------------------------*/

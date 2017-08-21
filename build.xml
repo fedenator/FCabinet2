@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="FCabinet2" basedir="." default="main">
+	
+	<!-- Classpath de las librerias -->
+	<path id="classpath">
+        <fileset dir="build/lib/" includes="**/*.jar"/>
+    </path>
+	<manifestclasspath property="lib.list" jarfile="build/FCabinet2.jar">
+		<classpath refid="classpath"/>
+	</manifestclasspath>
+	
+	<!-- Limpia el jar y los compilados -->
+	<target name="clean">
+		<delete dir="build/classes"/>
+		<delete file="build/FCabinet2.jar"/>
+	</target>
+	
+	<!-- Compila el codigo y las librerias -->
+	<target name="compile">
+		<mkdir dir="build/classes/"/>
+		<javac debug="true" srcdir="src" destdir="build/classes" classpathref="classpath" includeantruntime="false"/>
+	</target>
+	
+	<!-- Crea un jar a partir de los archivos compilados -->
+	<target name="jar" depends="compile">		
+		<jar destfile="build/FCabinet2.jar" basedir="build/classes">
+			<manifest>
+				<attribute name="Main-Class" value="start.FCabinet"/>
+				<attribute name="Class-Path" value="${lib.list}"/>
+			</manifest>
+		</jar>
+	</target>
+	
+	<!-- Ejecuta el jar -->
+	<target name="run" depends="jar">
+		<exec dir="build" executable="cmd" os="Windows 10">
+			<arg line="/c Debug.bat"/>
+    	</exec>
+	</target>
+	
+	<!-- Limpia, compila y ejecuta-->
+	<target name="main" depends="clean, run"/>
+</project>
