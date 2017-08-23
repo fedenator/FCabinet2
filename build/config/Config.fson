@@ -1,8 +1,9 @@
-modoSinCamara = True;
+modoSinCamara = False;
 imprimir = False;
 guardar  = True;
 
 delay = 1.0;
+impresiones = 2;
 
 carpetaDeGuardado = "C:\Users\Federico Palacios\Desktop\SaveFolder";
 

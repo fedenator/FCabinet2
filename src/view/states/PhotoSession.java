@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JComponent;
 import javax.swing.JLayeredPane;
+import javax.swing.KeyStroke;
 
 import camera.FCam;
 import camera.FCamDebug;
@@ -15,6 +16,7 @@ import flibs.graphics.animation.AnimationChain;
 import flibs.graphics.animation.CodedAnimation;
 import flibs.graphics.animation.ParallelAnimation;
 import flibs.graphics.animation.ScriptAnimation;
+import flibs.util.ActionFactory;
 import flibs.util.Loader;
 import view.components.CameraPreview;
 import view.components.CountdownDisplayer;
@@ -24,7 +26,7 @@ import view.components.PhotoDisplayer;
 /**
  * Estado donde se sacan las fotos
  */
-public class PhotoSession extends JLayeredPane{
+public class PhotoSession extends JLayeredPane {
 	
 	/*---------------------------- Constantes ----------------------------------------*/
 	//Id pito corto
@@ -51,7 +53,6 @@ public class PhotoSession extends JLayeredPane{
 	
 	private Application app;
 	
-	
 	/*--------------------------- Constructores --------------------------------------*/
 	public PhotoSession() {
 		
@@ -63,19 +64,27 @@ public class PhotoSession extends JLayeredPane{
 		
 		delay = (int)config.getDoubleValue("delay") * CodedAnimation.SECOND;
 		
+		String takePhotosKey= config.getStringValue("teclaSacarFotos").toUpperCase();
+		
 		//Imagen por defecto de los displayer para las fotos
 		BufferedImage defaultPhotoDisplayerImg = Loader.loadBufferedImage( config.getStringValue("PhotoDisplayerDefault") );
 		
 		backgroundImage = Loader.loadBufferedImage( config.getStringValue("BackgroundImage") );
 		
 		//Carga la camara debug o la camara normal segun el archivo de configuracion
-		FCam fcam = ( config.getBooleanValue("modoSinCamara") )? new FCamDebug("rsc\\Example.jpg"): new FCamOpenCV(0, "lib\\opencv_java320.dll"); 
+		String osBits = System.getProperty("sun.arch.data.model") ;
+		FCam fcam = ( config.getBooleanValue("modoSinCamara") )? new FCamDebug("rsc\\Example.jpg"): new FCamOpenCV(0, "lib\\opencv_java320x"+osBits+".dll"); 
 		
 		/*------------------------------ Crea y agrega el GUI --------------------------------*/
 		fglassPane = new FlashingGlassPane();
 		app.setGlassPane(fglassPane);
 		
 		this.setLayout(null);
+		
+		ActionFactory.addActionToKeyStroke(this, "takePhotos", takePhotosKey, () -> takePhotos() );
+		
+		this.getInputMap().put(KeyStroke.getKeyStroke(takePhotosKey), "takePhotos");
+		this.getActionMap().put("takePhotos", ActionFactory.basic( () -> takePhotos() ));
 		
 		photoDisplayer1 = new PhotoDisplayer(this, defaultPhotoDisplayerImg, 10, 10, 442, 242);
 		photoDisplayer2 = new PhotoDisplayer(this, defaultPhotoDisplayerImg, 10, 262, 442, 242);

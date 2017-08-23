@@ -9,7 +9,6 @@ import java.awt.image.BufferedImage;
 import javax.swing.JComponent;
 
 import camera.FCam;
-import flibs.graphics.Scaller;
 import view.states.PhotoSession;
 
 /**
@@ -44,20 +43,22 @@ public class CameraPreview extends JComponent implements Runnable, MouseListener
 	/*--------------------------- Funciones -------------------------------*/
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		if (img != null) g.drawImage(img, 0, 0, null);
+		if (img != null) g.drawImage(img, 0, 0, getWidth(), getHeight(), null);
 	}
 	
 	//Controla el tiempo de las animaciones
 	public void run() {
 		
 		while (true) {
-			if (getWidth() > 0 && getHeight() > 0) {
-				BufferedImage snapshot = fcam.getSnapShot();
-				if (snapshot != null) {
-					EventQueue.invokeLater( () -> img = Scaller.basicScale( snapshot, getWidth(), getHeight() ) );
-					repaint();
+			EventQueue.invokeLater( () -> {
+				if (getWidth() > 0 && getHeight() > 0) {
+					BufferedImage snapshot = fcam.getSnapShot();
+					if (snapshot != null) {
+						 img = snapshot;
+						repaint();
+					}
 				}
-			}
+			});
 			try                 { Thread.sleep(30); }
 			catch (Exception e) { e.printStackTrace(); }
 		}

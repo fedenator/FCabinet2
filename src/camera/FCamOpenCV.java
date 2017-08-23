@@ -46,7 +46,7 @@ public class FCamOpenCV implements Runnable, FCam {
 		
 		
 		//Abre la camara
-		camera = new VideoCapture(cammera);
+		camera = new VideoCapture(0);
 		
 		thread.start();
 	}
@@ -56,14 +56,6 @@ public class FCamOpenCV implements Runnable, FCam {
 	 * Devuelva la ultima captura de la camaraprocesada
 	 */
 	public BufferedImage getSnapShot() {
-		while (this.image != null) {
-			try {
-				Thread.sleep(10);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		
 		return this.image;
 	}
 	

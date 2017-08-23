@@ -17,10 +17,13 @@ import flibs.fson.FSON;
 import flibs.fson.FsonFileManagement;
 import flibs.graphics.Scaller;
 import flibs.printer.FPrinter;
+import flibs.util.ActionFactory;
 import flibs.util.Loader;
 import view.components.FilmStripPreview;
 import view.components.ImageDisplayer;
-
+/**
+ * Form para imprimir las tiras
+ */
 public class FilmStripMaker extends JPanel {
 
 	private static final long serialVersionUID = 1L;
@@ -38,40 +41,49 @@ public class FilmStripMaker extends JPanel {
 	
 	private String saveFolder;
 	
+	private int printCopies;
+	
 	private boolean save;
 	private boolean print;
+	private String printKey;
+	private String cancelKey;
 	
 	public FilmStripMaker(BufferedImage... photos) {
 		
 		//Carga el archivo de configuracion
-		FSON config         = FsonFileManagement.loadFsonFile("config\\Config.fson");
-		FSON filmStripModel = FsonFileManagement.loadFsonFile("rsc\\filmStrip\\FilmStripModel.fson");
+		FSON config         = FsonFileManagement.loadFsonFile ("config\\Config.fson");
+		FSON filmStripModel = FsonFileManagement.loadFsonFile ("rsc\\filmStrip\\FilmStripModel.fson");
 		
-		saveFolder = config.getStringValue("carpetaDeGuardado");
-		save       = config.getBooleanValue("guardar");
-		print      = config.getBooleanValue("imprimir");
+		saveFolder = config.getStringValue  ("carpetaDeGuardado");
+		save       = config.getBooleanValue ("guardar");
+		print      = config.getBooleanValue ("imprimir");
+		
+		printKey  = config.getStringValue("teclaImprimir").toUpperCase();
+		cancelKey = config.getStringValue("teclaCancelar").toUpperCase();
+		
+		printCopies = config.getIntValue("impresiones");
 		
 		background = Loader.loadBufferedImage( config.getStringValue("BackgroundImage") );
 		
 		BufferedImage buttonImage = Loader.loadBufferedImage( config.getStringValue("ButtonImage") );
 		
 		/*----------------- Create and show GUI -----------------*/
-		setLayout(null);
+		this.setLayout(null);
+		
+		ActionFactory.addActionToKeyStroke(this, "cancel", cancelKey, () -> cancel() );
+		ActionFactory.addActionToKeyStroke(this, "print", printKey, () -> printAction() );
 		
 		imageDisplayer1 = new ImageDisplayer(photos[0], 10, 10, 442, 242 );
 		imageDisplayer2 = new ImageDisplayer(photos[1], 10, 262, 442, 242);
 		imageDisplayer3 = new ImageDisplayer(photos[2], 10, 516, 442, 242);
 		
 		btnPrint  = new JButton    ("Imprimir");
-		btnPrint.addActionListener ( a -> {
-			if (save)  saveImages();
-			if (print) print();
-		});
+		btnPrint.addActionListener ( a -> printAction() );
 		btnPrint.setBounds         (1206, 458, 150, 150);
 		setUpButton                (btnPrint, buttonImage);
 		
 		btnCancel = new JButton     ("Cancelar");
-		btnCancel.addActionListener ( a -> Application.getInstance().restart() );
+		btnCancel.addActionListener ( a -> cancel() );
 		btnCancel.setBounds         (1206, 608, 150, 150);
 		setUpButton                 (btnCancel, buttonImage);
 		
@@ -107,16 +119,28 @@ public class FilmStripMaker extends JPanel {
 		}
 	}
 	
+	private void printAction() {
+		if (save)  saveImages();
+		if (print) print();
+		Application.getInstance().restart();
+	}
+	
 	//Imprime las fotos
 	private void print() {
-		FPrinter.print(filmStripPreview.getFilmStrip().createPrintableImage(FPrinter.DPI_STANDAR_PRINTER), 10, 15, MediaSize.ISO.A6);
+		for (int i=0; i<printCopies; i++)
+			FPrinter.print(filmStripPreview.getFilmStrip().createPrintableImage(FPrinter.DPI_STANDAR_PRINTER), 10, 15, MediaSize.ISO.A6);
+		Application.getInstance().restart();
+	}
+	
+	private void cancel() {
+		System.out.println("gunasjbdasid");
+		Application.getInstance().restart();
 	}
 	
 	private void add(JComponent... comps) {
 		for (JComponent comp : comps) add(comp);
 	}
 	
-	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		g.drawImage(background, 0, 0, this);
