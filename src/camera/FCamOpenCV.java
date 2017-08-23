@@ -46,7 +46,7 @@ public class FCamOpenCV implements Runnable, FCam {
 		
 		
 		//Abre la camara
-		camera = new VideoCapture(0);
+		camera = new VideoCapture(cammera);
 		
 		thread.start();
 	}
