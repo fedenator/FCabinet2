@@ -1,0 +1,18 @@
+modoSinCamara = True;
+imprimir = False;
+guardar  = False;
+
+delay = 1.0;
+impresiones = 2;
+
+carpetaDeGuardado = "/home/fpalacios/Desktop/SaveFolder";
+
+teclaImprimir   = "p";
+teclaCancelar   = "c";
+teclaSacarFotos = "enter";
+
+PhotoDisplayerDefault = "rsc/Default.jpg";
+PhotoDisplayerFrame   = "rsc/Marco.png";
+CameraPreviewFrame    = "rsc/Marco.png";
+ButtonImage           = "rsc/Button2.png";
+BackgroundImage       = "rsc/Background.png";

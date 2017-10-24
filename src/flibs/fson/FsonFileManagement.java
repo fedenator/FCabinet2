@@ -5,44 +5,48 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 
 public class FsonFileManagement {
+
 	/**
 	 * Ojo que sobreescribe archivos con el mismo nombre
 	 * Usa buffered file writer
 	 */
-	public static void writeFsonFile(FSON fson, String path) {
-		try {
-			File file = new File(path);
-			if (!file.exists()) file.createNewFile();
-			FileWriter fileWriter = new FileWriter(file.getAbsoluteFile());
+	public static void writeFsonFile(FSON fson, String path) throws IOException {
+		File file = new File(path);
+		if ( !file.exists() ) file.createNewFile();
+
+		try (
+			FileWriter fileWriter = new FileWriter( file.getAbsoluteFile() );
 			BufferedWriter writer = new BufferedWriter(fileWriter);
-			writer.write(fson.toString());
-			writer.close();
+		) {
+			writer.write( fson.toString() );
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static FSON loadFsonFile(String path) {
 		FSON flag = new FSON();
-		
-		try{
-			File file = new File(path);
+
+		File file = new File(path);
+
+		try (
 			FileReader fileReader = new FileReader(file.getAbsoluteFile());
 			BufferedReader reader = new BufferedReader(fileReader);
-			
-			String text = "", line="";
+		) {
+			StringBuilder text = new StringBuilder("");
+			String line;
 			while((line=reader.readLine()) != null){
-				text += line;
+				text.append(line);
 			}
-			reader.close();
-			
-			flag.loadFromString(text);
+
+			flag.loadFromString( text.toString() );
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		return flag;
 	}
 }

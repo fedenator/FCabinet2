@@ -14,17 +14,17 @@ import flibs.util.Loader;
  * Captura todo el tiempo la camara y va dejando la ultima captura procesada guardada para devolver
  */
 public class FCamOpenCV implements Runnable, FCam {
-	
+
 	/*--------------------------- Propiedades --------------------------------------*/
 	private VideoCapture camera; //Reprecenta la camara que se esta usando
 	private Mat frame;           //Matriza que representa una imagen
-	
+
 	//Hilo de procesamiento en donde se va caputrando la camara
 	private Thread thread = new Thread(this);
-	
+
 	//Ultima captura procesada
 	private volatile BufferedImage image;
-	
+
 	/*-------------------------------- Constructores ---------------------------------*/
 	/**
 	 * Crea una capturador para la camara dada,
@@ -34,20 +34,20 @@ public class FCamOpenCV implements Runnable, FCam {
 			//Obtiene la direccion del jar
 			File jarDir = new File(FCamOpenCV.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile();
 			String path = jarDir.getAbsolutePath();
-			
+
 			//Carga la libreria de OpenCV
-			path += "\\" + pathLib;
+			path += "/" + pathLib;
 			System.out.println(path);
 			System.load(path);
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		
+
+
 		//Abre la camara
 		camera = new VideoCapture(cammera);
-		
+
 		thread.start();
 	}
 
@@ -58,9 +58,9 @@ public class FCamOpenCV implements Runnable, FCam {
 	public BufferedImage getSnapShot() {
 		return this.image;
 	}
-	
+
 	//Devuelve una captura de la camara en tiempo real
-	private BufferedImage takeSnapShot() {		
+	private BufferedImage takeSnapShot() {
 		BufferedImage flag = null;
 
 		//Guarda una representacion de lo que ve la camara en la matriz frame
@@ -71,21 +71,21 @@ public class FCamOpenCV implements Runnable, FCam {
         if(!camera.isOpened()){
             System.out.println("Error");
         }
-        //Si no esta el programa 
-        else {                  
-            while(true){        
+        //Si no esta el programa
+        else {
+            while(true){
                 if (camera.read(frame)){
                     flag = MatToBufferedImage(frame);
                     break;
                 }
-            }   
+            }
         }
-        
+
         frame.release();
-        
+
         return flag;
 	}
-	
+
 	//Crea un BufferedImage compatible con la pantalla con la imagen de la camara
     private BufferedImage MatToBufferedImage(Mat frame) {
     	//Guarda el tipo de la imagen
@@ -95,10 +95,10 @@ public class FCamOpenCV implements Runnable, FCam {
         } else if (frame.channels() == 3) {
             type = BufferedImage.TYPE_3BYTE_BGR;
         }
-        
+
         //Crea un buffered imagen del mismo tipo
         BufferedImage image = new BufferedImage(frame.width(), frame.height(), type);
-        
+
         //Guarda el contenido del Mat en el raster del BufferedImage
         WritableRaster raster = image.getRaster();
         DataBufferByte dataBuffer = (DataBufferByte) raster.getDataBuffer();
@@ -120,5 +120,5 @@ public class FCamOpenCV implements Runnable, FCam {
 			}
 		}
 	}
-	
+
 }

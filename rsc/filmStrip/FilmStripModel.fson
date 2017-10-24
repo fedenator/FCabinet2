@@ -1,0 +1,23 @@
+Width  = 10.0;
+Height = 15.0;
+
+Background="rsc/filmStrip/BackGround.png";
+
+Image {
+	x = 2.0;
+	y = 2.0;
+	width  = 71.0;
+	height = 30.0;
+};
+Image {
+	x = 2.0;
+	y = 34.0;
+	width  = 71.0;
+	height = 30.0;
+};
+Image {
+	x = 2.0;
+	y = 67.3;
+	width  = 71.0;
+	height = 30.0;
+};
