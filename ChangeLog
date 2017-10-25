@@ -1,2 +1,1 @@
--change    funcionando en linux
--add       modulo detexion de sistema operativo
+-change        improve error handling, con errores fatales 

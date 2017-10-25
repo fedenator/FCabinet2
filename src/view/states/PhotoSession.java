@@ -1,5 +1,9 @@
 package view.states;
 
+import java.net.URISyntaxException;
+
+import java.io.IOException;
+
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
@@ -20,6 +24,7 @@ import flibs.graphics.animation.ParallelAnimation;
 import flibs.graphics.animation.ScriptAnimation;
 
 import flibs.util.ActionFactory;
+import flibs.util.ErrorHandler;
 import flibs.util.Loader;
 import flibs.util.Sys;
 
@@ -60,24 +65,33 @@ public class PhotoSession extends JLayeredPane {
 
 	/*--------------------------- Constructores --------------------------------------*/
 	public PhotoSession() {
-
-		//Obtiene el singleton
 		app = Application.getInstance();
 
-		//Carga el archivo de configuracion
-		FSON config = FsonFileManagement.loadFsonFile("config/Config.fson");
+		FSON config = null;
+		String takePhotosKey = null;
 
-		delay = (int)config.getDoubleValue("delay") * CodedAnimation.SECOND;
+		BufferedImage defaultPhotoDisplayerImg = null;
+		//Load configuration
+		try {
+			config = FsonFileManagement.loadFsonFile("config/Config.fson");
 
-		String takePhotosKey = config.getStringValue("teclaSacarFotos").toUpperCase();
+			takePhotosKey = config.getStringValue("teclaSacarFotos").toUpperCase();
 
-		//Imagen por defecto de los displayer para las fotos
-		BufferedImage defaultPhotoDisplayerImg = Loader.loadBufferedImage( config.getStringValue("PhotoDisplayerDefault") );
+			delay = (int)config.getDoubleValue("delay") * CodedAnimation.SECOND;
 
-		backgroundImage = Loader.loadBufferedImage( config.getStringValue("BackgroundImage") );
+			defaultPhotoDisplayerImg = Loader.loadBufferedImage( config.getStringValue("PhotoDisplayerDefault") );
 
-		//Carga la camara debug o la camara normal segun el archivo de configuracion
-		FCam fcam = loadCamera( config.getBooleanValue("modoSinCamara") );
+			backgroundImage = Loader.loadBufferedImage( config.getStringValue("BackgroundImage") );
+		} catch (IOException e) {
+			ErrorHandler.fatal("Error loading PhotoSession configuration.", e);
+		}
+
+		FCam fcam = null;
+		try {
+			fcam = loadCamera( config.getBooleanValue("modoSinCamara") );
+		} catch(URISyntaxException | IOException e) {
+			ErrorHandler.fatal("Error loading camera.", e);
+		}
 
 		/*------------------------------ Crea y agrega el GUI --------------------------------*/
 		fglassPane = new FlashingGlassPane();
@@ -134,7 +148,7 @@ public class PhotoSession extends JLayeredPane {
 
 	/*--------------------------------- Funciones ------------------------------------*/
 
-	private FCam loadCamera(boolean cameraDebug) {
+	private FCam loadCamera(boolean cameraDebug) throws URISyntaxException, IOException {
 		FCam flag = null;
 
 		int osBits = Sys.geyOSBytes();

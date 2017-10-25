@@ -22,12 +22,12 @@ public class FsonFileManagement {
 			BufferedWriter writer = new BufferedWriter(fileWriter);
 		) {
 			writer.write( fson.toString() );
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (IOException e) {
+			throw e;
 		}
 	}
 
-	public static FSON loadFsonFile(String path) {
+	public static FSON loadFsonFile(String path) throws IOException {
 		FSON flag = new FSON();
 
 		File file = new File(path);
@@ -43,8 +43,8 @@ public class FsonFileManagement {
 			}
 
 			flag.loadFromString( text.toString() );
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (IOException e) {
+			throw e;
 		}
 
 		return flag;

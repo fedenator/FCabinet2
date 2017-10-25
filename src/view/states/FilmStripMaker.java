@@ -1,13 +1,18 @@
 package view.states;
 
+import java.io.IOException;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Insets;
+
 import java.awt.image.BufferedImage;
+
 import java.time.LocalDateTime;
 
 import javax.print.attribute.standard.MediaSize;
+
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -15,10 +20,15 @@ import javax.swing.JPanel;
 
 import flibs.fson.FSON;
 import flibs.fson.FsonFileManagement;
+
 import flibs.graphics.Scaller;
+
 import flibs.printer.FPrinter;
+
 import flibs.util.ActionFactory;
 import flibs.util.Loader;
+import flibs.util.ErrorHandler;
+
 import view.components.FilmStripPreview;
 import view.components.ImageDisplayer;
 /**
@@ -50,22 +60,30 @@ public class FilmStripMaker extends JPanel {
 
 	public FilmStripMaker(BufferedImage... photos) {
 
-		//Carga el archivo de configuracion
-		FSON config         = FsonFileManagement.loadFsonFile ("config/Config.fson");
-		FSON filmStripModel = FsonFileManagement.loadFsonFile ("rsc/filmStrip/FilmStripModel.fson");
+		FSON config = null;
+		FSON filmStripModel = null;
 
-		saveFolder = config.getStringValue  ("carpetaDeGuardado");
-		save       = config.getBooleanValue ("guardar");
-		print      = config.getBooleanValue ("imprimir");
+		BufferedImage buttonImage = null;
 
-		printKey  = config.getStringValue("teclaImprimir").toUpperCase();
-		cancelKey = config.getStringValue("teclaCancelar").toUpperCase();
+		try {
+			config = FsonFileManagement.loadFsonFile ("config/Config.fson");
+			filmStripModel = FsonFileManagement.loadFsonFile ("rsc/filmStrip/FilmStripModel.fson");
 
-		printCopies = config.getIntValue("impresiones");
+			saveFolder = config.getStringValue  ("carpetaDeGuardado");
+			save       = config.getBooleanValue ("guardar");
+			print      = config.getBooleanValue ("imprimir");
 
-		background = Loader.loadBufferedImage( config.getStringValue("BackgroundImage") );
+			printKey  = config.getStringValue("teclaImprimir").toUpperCase();
+			cancelKey = config.getStringValue("teclaCancelar").toUpperCase();
 
-		BufferedImage buttonImage = Loader.loadBufferedImage( config.getStringValue("ButtonImage") );
+			printCopies = config.getIntValue("impresiones");
+
+			background = Loader.loadBufferedImage( config.getStringValue("BackgroundImage") );
+
+			buttonImage = Loader.loadBufferedImage( config.getStringValue("ButtonImage") );
+		} catch (IOException e) {
+			ErrorHandler.fatal("Error loading FilmStripMaker configuration.", e);
+		}
 
 		/*----------------- Create and show GUI -----------------*/
 		this.setLayout(null);
@@ -87,7 +105,11 @@ public class FilmStripMaker extends JPanel {
 		btnCancel.setBounds         (1206, 608, 150, 150);
 		setUpButton                 (btnCancel, buttonImage);
 
-		filmStripPreview = new FilmStripPreview(filmStripModel, 654, 10, 499, 748, photos);
+		try {
+			filmStripPreview = new FilmStripPreview(filmStripModel, 654, 10, 499, 748, photos);
+		} catch (IOException e) {
+			ErrorHandler.fatal("Error creating FilmStripPreview.", e);
+		}
 
 		add(imageDisplayer1, imageDisplayer2, imageDisplayer3, filmStripPreview, btnPrint, btnCancel);
 	}
@@ -114,8 +136,11 @@ public class FilmStripMaker extends JPanel {
 			date.getMonth() + "-" + date.getYear() + "--" +
 			date.getHour() + "-" + date.getMinute() + "-" + date.getSecond() + "-" + i + ".png";
 
-			Loader.saveImage(filmStripPreview.getPhotos()[i], saveFolder+"/"+name, "png");
-			System.out.println(saveFolder+"/"+name);
+			try {
+				Loader.saveImage(filmStripPreview.getPhotos()[i], saveFolder+"/"+name, "png");
+			} catch (IOException e) {
+				ErrorHandler.soft("Error saveing images.", e);
+			}
 		}
 	}
 
@@ -133,7 +158,6 @@ public class FilmStripMaker extends JPanel {
 	}
 
 	private void cancel() {
-		System.out.println("gunasjbdasid");
 		Application.getInstance().restart();
 	}
 

@@ -2,12 +2,17 @@ package filmStrip;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+
 import java.awt.image.BufferedImage;
+
 import java.util.ArrayList;
 
 import flibs.fson.FSON;
+
 import flibs.util.FMath;
 import flibs.util.Loader;
+
+import java.io.IOException;
 
 /**
  * Representa una tira de fotos
@@ -26,13 +31,13 @@ public class FilmStrip {
 
 	/*---------------------------- Constructores ------------------------------*/
 	//Crea una tira de fotos con el modelo y las fotos dadas
-	public FilmStrip(FSON model, BufferedImage[] photos) {
+	public FilmStrip(FSON model, BufferedImage[] photos) throws IOException {
 		this.model = model;
 		this.loadElements(photos);
 	}
 
 	/*----------------------------- Funciones --------------------------------*/
-	private void loadElements(BufferedImage[] photos) {
+	private void loadElements(BufferedImage[] photos) throws IOException{
 
 		this.width  = model.getDoubleValue("Width");
 		this.height = model.getDoubleValue("Height");
@@ -43,12 +48,11 @@ public class FilmStrip {
 			elements.add( new FilmStripElement(img, 0, 0, 100, 100) );
 		}
 
-
 		//Carga los elementos
 		FSON components[] = model.getDirectSubElements();
 		int photosUsed = 0; //Contador de fotos usadas
 		for (FSON comp : components) {
-			if(comp.getTag().equals("Image")) {
+			if( comp.getTag().equals("Image") ) {
 				double percentX = comp.getDoubleValue("x");
 				double percentY = comp.getDoubleValue("y");
 				double percentW = comp.getDoubleValue("width");
@@ -56,7 +60,7 @@ public class FilmStrip {
 
 				//Si el elemento tiene el atributo src es que es una imagen predefinida
 				BufferedImage img = null;
-				if (comp.hasDirectKey("src")) {
+				if ( comp.hasDirectKey("src") ) {
 					img = Loader.loadBufferedImage( comp.getStringValue("src") );
 				} else { //Si no hay que usar una foto que se saco el usuario
 					img = photos[photosUsed];

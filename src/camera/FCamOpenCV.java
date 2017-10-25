@@ -2,7 +2,10 @@ package camera;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.awt.image.WritableRaster;
+
 import java.io.File;
+
+import java.net.URISyntaxException;
 
 import org.opencv.core.Mat;
 import org.opencv.videoio.VideoCapture;
@@ -29,21 +32,15 @@ public class FCamOpenCV implements Runnable, FCam {
 	/**
 	 * Crea una capturador para la camara dada,
 	 */
-	public FCamOpenCV(int cammera, String pathLib) {
-		try {
-			//Obtiene la direccion del jar
-			File jarDir = new File(FCamOpenCV.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile();
-			String path = jarDir.getAbsolutePath();
+	public FCamOpenCV(int cammera, String pathLib) throws URISyntaxException {
+		//Obtiene la direccion del jar
+		File jarDir = new File(FCamOpenCV.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile();
+		String path = jarDir.getAbsolutePath();
 
-			//Carga la libreria de OpenCV
-			path += "/" + pathLib;
-			System.out.println(path);
-			System.load(path);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
+		//Carga la libreria de OpenCV
+		path += "/" + pathLib;
+		System.out.println(path);
+		System.load(path);
 
 		//Abre la camara
 		camera = new VideoCapture(cammera);
