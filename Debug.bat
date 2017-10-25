@@ -1,1 +1,0 @@
-java -jar FCabinet2.jar

@@ -1,1 +1,2 @@
--change        improve error handling, con errores fatales 
+-remove        Fuera el debug.bat
+-add           Id de camara configurable 

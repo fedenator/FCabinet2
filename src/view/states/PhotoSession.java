@@ -70,25 +70,24 @@ public class PhotoSession extends JLayeredPane {
 		FSON config = null;
 		String takePhotosKey = null;
 
+		int cameraId = 0;
+
 		BufferedImage defaultPhotoDisplayerImg = null;
 		//Load configuration
 		try {
 			config = FsonFileManagement.loadFsonFile("config/Config.fson");
-
 			takePhotosKey = config.getStringValue("teclaSacarFotos").toUpperCase();
-
 			delay = (int)config.getDoubleValue("delay") * CodedAnimation.SECOND;
-
 			defaultPhotoDisplayerImg = Loader.loadBufferedImage( config.getStringValue("PhotoDisplayerDefault") );
-
 			backgroundImage = Loader.loadBufferedImage( config.getStringValue("BackgroundImage") );
+			cameraId = config.getIntValue("camara");
 		} catch (IOException e) {
 			ErrorHandler.fatal("Error loading PhotoSession configuration.", e);
 		}
 
 		FCam fcam = null;
 		try {
-			fcam = loadCamera( config.getBooleanValue("modoSinCamara") );
+			fcam = loadCamera (config.getBooleanValue("modoSinCamara"), cameraId);
 		} catch(URISyntaxException | IOException e) {
 			ErrorHandler.fatal("Error loading camera.", e);
 		}
@@ -148,7 +147,7 @@ public class PhotoSession extends JLayeredPane {
 
 	/*--------------------------------- Funciones ------------------------------------*/
 
-	private FCam loadCamera(boolean cameraDebug) throws URISyntaxException, IOException {
+	private FCam loadCamera(boolean cameraDebug, int cameraId) throws URISyntaxException, IOException {
 		FCam flag = null;
 
 		int osBits = Sys.geyOSBytes();
@@ -158,9 +157,9 @@ public class PhotoSession extends JLayeredPane {
 			flag = new FCamDebug("rsc/Example.jpg");
 		} else {
 			if (os == Sys.OS.LINUX)
-				flag = new FCamOpenCV(0, "lib/libopencv_java330.so");
+				flag = new FCamOpenCV(cameraId, "lib/libopencv_java330.so");
 			else
-				flag = new FCamOpenCV(0, "lib/opencv_java320x"+osBits+".dll");
+				flag = new FCamOpenCV(cameraId, "lib/opencv_java320x"+osBits+".dll");
 		}
 
 		return flag;
